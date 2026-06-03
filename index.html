@@ -3,99 +3,138 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Privacy Policy — Adaptive Furigana</title>
+    <title>Adaptive Furigana — JLPT-aware Japanese reading aid</title>
+    <meta
+      name="description"
+      content="A Chrome extension that adds furigana only to kanji above your JLPT level and shows an offline dictionary on click. Free, with an optional one-time Pro upgrade."
+    />
     <style>
+      :root { --indigo: #4f46e5; }
+      * { box-sizing: border-box; }
       body {
-        font-family: system-ui, -apple-system, sans-serif;
-        max-width: 720px;
-        margin: 40px auto;
-        padding: 0 20px;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 48px 20px 80px;
         line-height: 1.7;
         color: #1a1a1a;
       }
-      h1 { font-size: 24px; }
-      h2 { font-size: 18px; margin-top: 28px; }
-      .updated { color: #777; font-size: 14px; }
-      a { color: #4f46e5; }
-      hr { border: none; border-top: 1px solid #eee; margin: 32px 0; }
+      header { text-align: center; margin-bottom: 8px; }
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 64px; height: 64px;
+        background: var(--indigo);
+        color: #fff;
+        border-radius: 14px;
+        font-size: 30px;
+        font-weight: 700;
+        margin-bottom: 16px;
+      }
+      h1 { font-size: 30px; margin: 0 0 8px; }
+      .tagline { color: #555; font-size: 17px; margin-top: 0; }
+      h2 { font-size: 20px; margin-top: 40px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+      h3 { font-size: 16px; margin-bottom: 4px; }
+      a { color: var(--indigo); }
+      ul { padding-left: 22px; }
+      li { margin: 6px 0; }
+      .card {
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin: 16px 0;
+      }
+      .price { font-weight: 700; color: var(--indigo); }
+      footer {
+        margin-top: 56px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+        color: #777;
+        text-align: center;
+      }
+      footer a { margin: 0 8px; }
       .ja { color: #444; }
+      hr { border: none; border-top: 1px solid #eee; margin: 40px 0; }
     </style>
   </head>
   <body>
-    <h1>Privacy Policy — Adaptive Furigana</h1>
-    <p class="updated">Last updated: 2026-06-02</p>
+    <header>
+      <div class="logo">読</div>
+      <h1>Adaptive Furigana</h1>
+      <p class="tagline">Read Japanese on any website at exactly your level.</p>
+    </header>
 
     <p>
-      Adaptive Furigana ("the extension") is designed to work entirely on your
-      device. We take the strongest possible stance on privacy: the extension
-      does <strong>not collect, store, or transmit any personal data</strong>.
+      <strong>Adaptive Furigana</strong> is a Chrome browser extension for people
+      learning Japanese. Unlike tools that spray furigana over every kanji, it
+      adds readings <strong>only to kanji that are harder than your JLPT level</strong>.
+      Set your level (N5–N1) and the kanji you already know stay clean, while the
+      ones you don't get a small reading above them.
     </p>
 
-    <h2>What the extension accesses</h2>
+    <h2>Features (free)</h2>
+    <ul>
+      <li><strong>Adaptive furigana</strong> — readings appear only above kanji harder than your level (N5–N1)</li>
+      <li><strong>Click-to-define</strong> — click any word for its reading, part of speech, and meaning</li>
+      <li><strong>100% offline</strong> — the tokenizer and dictionary are bundled in the extension; no servers, no tracking, no account</li>
+      <li><strong>Per-site control</strong> and adjustable ruby size and color</li>
+    </ul>
+
+    <h2>Pro upgrade — what we sell</h2>
+    <div class="card">
+      <h3>Adaptive Furigana Pro <span class="price">— one-time purchase (about ¥800)</span></h3>
+      <p>
+        A single, optional in-extension purchase unlocks a richer reading
+        experience. It is a one-time payment, not a subscription:
+      </p>
+      <ul>
+        <li><strong>Full dictionary</strong> — every sense of a word, each tagged with its part of speech</li>
+        <li><strong>Example sentences</strong> — real Japanese sentences with English translations</li>
+        <li><strong>Read-aloud</strong> — hear the word pronounced (browser text-to-speech)</li>
+      </ul>
+      <p>
+        The free version stays fully functional forever — Pro just adds depth for
+        serious learners. Payment is processed securely through
+        <a href="https://extensionpay.com" target="_blank" rel="noopener">ExtensionPay</a>
+        and <a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a>;
+        we never see your card details.
+      </p>
+    </div>
+
+    <h2>Privacy</h2>
     <p>
-      The visible text of the web page you are viewing, in order to add furigana
-      and provide click-to-define lookups. This text is processed locally in
-      your browser and is never sent to us or any third party.
+      This extension does not collect, store, or transmit any personal data. All
+      processing happens locally in your browser.
+      Read the full <a href="./privacy.html">Privacy Policy</a>.
     </p>
 
-    <h2>What the extension stores</h2>
-    <p>
-      Your preferences only (JLPT level, which sites it is enabled on, ruby size
-      and color), saved locally via the browser's storage. These never leave
-      your browser.
-    </p>
-
-    <h2>Network</h2>
-    <p>
-      The free features are fully offline. The bundled dictionary and tokenizer
-      ship inside the extension. The optional Pro upgrade uses
-      <a href="https://extensionpay.com" target="_blank" rel="noopener">ExtensionPay</a>
-      and Stripe to process a one-time payment. Payment is handled by those
-      providers under their own privacy policies; we never see your card details.
-    </p>
-
-    <h2>Third-party data sources (bundled, not network calls)</h2>
+    <h2>Data sources &amp; attribution</h2>
     <ul>
       <li>Dictionary: JMdict/EDICT project (EDRDG licence)</li>
       <li>Example sentences: Tatoeba project (CC-BY)</li>
     </ul>
 
-    <h2>Contact</h2>
-    <p><a href="mailto:moumuri123123@gmail.com">moumuri123123@gmail.com</a></p>
-
     <hr />
 
-    <h1>プライバシーポリシー（日本語）</h1>
-    <p class="updated">最終更新日: 2026-06-02</p>
+    <h2 class="ja">日本語</h2>
     <p class="ja">
-      Adaptive Furigana（本拡張機能）は、すべての処理をあなたの端末内で完結する
-      よう設計されています。本拡張機能は、いかなる個人データも
-      <strong>収集・保存・送信しません</strong>。
+      <strong>Adaptive Furigana</strong> は、日本語学習者向けの Chrome 拡張機能です。
+      すべての漢字にルビを振るのではなく、<strong>あなたの JLPT レベルより難しい漢字だけ</strong>に
+      読みを付けます。レベル（N5〜N1）を設定すると、知っている漢字はそのまま、
+      まだ知らない漢字にだけ小さく読みが付きます。
     </p>
-    <h2 class="ja">アクセスする情報</h2>
     <p class="ja">
-      ふりがなの付与とクリック辞書のため、あなたが閲覧中のWebページの表示テキスト
-      にアクセスします。このテキストはブラウザ内で処理され、当方や第三者に送信される
-      ことはありません。
+      本体は無料です。任意の買い切り「Pro」（一度きりの支払い・約 ¥800）を購入すると、
+      全語義＋品詞・英訳付き例文・読み上げ（音声合成）が解放されます。支払いは
+      ExtensionPay と Stripe を通じて安全に処理され、当方がカード情報を見ることはありません。
+      詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
     </p>
-    <h2 class="ja">保存する情報</h2>
-    <p class="ja">
-      設定のみ（JLPTレベル、有効にしたサイト、ルビのサイズと色）を、ブラウザの
-      ストレージにローカル保存します。これらがブラウザの外に出ることはありません。
-    </p>
-    <h2 class="ja">通信について</h2>
-    <p class="ja">
-      無料機能は完全オフラインで動作し、辞書と形態素解析器は拡張機能に同梱されて
-      います。任意のPro購入時のみ、ExtensionPayおよびStripeを利用して一回の支払いを
-      処理します。支払いは各社のプライバシーポリシーに基づき処理され、当方がカード
-      情報を見ることはありません。
-    </p>
-    <h2 class="ja">第三者データソース（同梱・通信なし）</h2>
-    <ul class="ja">
-      <li>辞書: JMdict/EDICT プロジェクト（EDRDGライセンス）</li>
-      <li>例文: Tatoeba プロジェクト（CC-BY）</li>
-    </ul>
-    <h2 class="ja">お問い合わせ</h2>
-    <p class="ja"><a href="mailto:moumuri123123@gmail.com">moumuri123123@gmail.com</a></p>
+
+    <footer>
+      <a href="./privacy.html">Privacy Policy</a> ·
+      <a href="mailto:moumuri123123@gmail.com">Contact</a>
+    </footer>
   </body>
 </html>
