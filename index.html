@@ -1,142 +1,499 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Adaptive Furigana — JLPT-aware Japanese reading aid</title>
+    <title>Adaptive Furigana — Read any Japanese website at your level</title>
     <meta
       name="description"
-      content="A Chrome extension that adds furigana only to kanji above your JLPT level and shows an offline dictionary on click. Free, with an optional one-time Pro upgrade."
+      content="Chrome extension that adds furigana to any website and shows an offline dictionary on click. Pro adapts readings to your JLPT level. Free, with a one-time $4.99 upgrade."
     />
     <style>
-      :root { --indigo: #4f46e5; }
-      * { box-sizing: border-box; }
+      :root {
+        --ink: #111;
+        --cream: #fff8e7;
+        --red: #ff3b30;
+        --blue: #0a84ff;
+        --yellow: #ffd60a;
+        --green: #34c759;
+      }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html { scroll-behavior: smooth; }
       body {
         font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 48px 20px 80px;
-        line-height: 1.7;
-        color: #1a1a1a;
+        background: var(--cream);
+        color: var(--ink);
       }
-      header { text-align: center; margin-bottom: 8px; }
-      .logo {
-        display: inline-flex;
+      .btn {
+        display: inline-block;
+        font-weight: 900;
+        font-size: 15px;
+        border: 3px solid var(--ink);
+        padding: 12px 20px;
+        text-decoration: none;
+        color: var(--ink);
+        background: #fff;
+        box-shadow: 4px 4px 0 var(--ink);
+        transition: transform 0.08s, box-shadow 0.08s;
+        cursor: pointer;
+      }
+      .btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+      .btn-red { background: var(--red); color: #fff; }
+      .btn-yellow { background: var(--yellow); }
+
+      nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 24px;
+        border-bottom: 4px solid var(--ink);
+        background: #fff;
+      }
+      .logo { display: flex; gap: 10px; align-items: center; font-weight: 900; font-size: 18px; }
+      .logo .mark {
+        width: 38px;
+        height: 38px;
+        background: var(--blue);
+        color: #fff;
+        border: 3px solid var(--ink);
+        display: flex;
         align-items: center;
         justify-content: center;
-        width: 64px; height: 64px;
-        background: var(--indigo);
-        color: #fff;
-        border-radius: 14px;
-        font-size: 30px;
-        font-weight: 700;
-        margin-bottom: 16px;
+        font-size: 18px;
+        box-shadow: 3px 3px 0 var(--ink);
       }
-      h1 { font-size: 30px; margin: 0 0 8px; }
-      .tagline { color: #555; font-size: 17px; margin-top: 0; }
-      h2 { font-size: 20px; margin-top: 40px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
-      h3 { font-size: 16px; margin-bottom: 4px; }
-      a { color: var(--indigo); }
-      ul { padding-left: 22px; }
-      li { margin: 6px 0; }
-      .card {
-        border: 1px solid #e5e5e5;
-        border-radius: 12px;
-        padding: 20px 24px;
-        margin: 16px 0;
-      }
-      .price { font-weight: 700; color: var(--indigo); }
-      footer {
-        margin-top: 56px;
-        padding-top: 20px;
-        border-top: 1px solid #eee;
-        font-size: 14px;
-        color: #777;
+
+      .section { padding: 64px 24px; }
+      .section h2 {
+        font-size: clamp(26px, 4vw, 38px);
+        font-weight: 900;
         text-align: center;
+        margin-bottom: 10px;
       }
-      footer a { margin: 0 8px; }
-      .ja { color: #444; }
-      hr { border: none; border-top: 1px solid #eee; margin: 40px 0; }
+      .section h2 .underline { box-shadow: inset 0 -14px 0 var(--yellow); }
+      .section p.lead { text-align: center; font-weight: 600; margin-bottom: 34px; }
+      ruby rt { color: var(--red); font-weight: 900; }
+
+      footer {
+        background: var(--ink);
+        color: #fff;
+        padding: 36px 24px;
+        text-align: center;
+        font-size: 14px;
+      }
+      footer a { color: var(--yellow); font-weight: 700; margin: 0 10px; }
+      footer .attr { margin-top: 14px; color: #aaa; font-size: 12px; line-height: 1.8; }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation: none !important; transition: none !important; }
+        html { scroll-behavior: auto; }
+      }
+
+      .hero { position: relative; overflow: hidden; padding: 72px 24px 88px; text-align: center; }
+      .kanji-float {
+        position: absolute;
+        width: 64px;
+        height: 64px;
+        border: 3px solid var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 900;
+        box-shadow: 5px 5px 0 var(--ink);
+      }
+      .k1 { background: var(--red); color: #fff; top: 14%; left: 7%; animation: float-a 5s ease-in-out infinite; }
+      .k2 { background: var(--blue); color: #fff; top: 58%; left: 13%; animation: float-b 6s ease-in-out infinite; }
+      .k3 { background: var(--yellow); top: 18%; right: 9%; animation: float-c 5.5s ease-in-out infinite; }
+      .k4 { background: var(--green); color: #fff; top: 62%; right: 7%; animation: float-a 6.5s ease-in-out infinite; }
+      @keyframes float-a {
+        0%, 100% { transform: translateY(0) rotateY(0) rotate(-6deg); }
+        50% { transform: translateY(-22px) rotateY(180deg) rotate(4deg); }
+      }
+      @keyframes float-b {
+        0%, 100% { transform: translateY(0) rotateX(0) rotate(7deg); }
+        50% { transform: translateY(-28px) rotateX(180deg) rotate(-5deg); }
+      }
+      @keyframes float-c {
+        0%, 100% { transform: translateY(0) rotateY(0) rotate(3deg); }
+        50% { transform: translateY(-16px) rotateY(-180deg) rotate(-8deg); }
+      }
+      .badges { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
+      .badge { font-weight: 900; font-size: 13px; padding: 5px 12px; border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+      h1 { font-size: clamp(34px, 6vw, 64px); font-weight: 900; line-height: 1.18; }
+      h1 .hl {
+        background: var(--blue);
+        color: #fff;
+        padding: 0 14px;
+        border: 4px solid var(--ink);
+        display: inline-block;
+        box-shadow: 6px 6px 0 var(--ink);
+      }
+      .ruby-demo { position: relative; display: inline-block; }
+      .ruby-demo .rt {
+        position: absolute;
+        top: -0.62em;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.32em;
+        color: var(--red);
+        font-weight: 900;
+        animation: ruby-drop 4s infinite;
+      }
+      @keyframes ruby-drop {
+        0% { transform: translateY(-50px) scale(2.6) rotate(-10deg); opacity: 0; }
+        18% { transform: translateY(0) scale(1) rotate(0); opacity: 1; }
+        30% { transform: scale(1.25); }
+        38%, 88% { transform: scale(1); opacity: 1; }
+        100% { opacity: 0; }
+      }
+      .hero p.sub { font-size: 18px; margin: 20px auto 30px; max-width: 560px; font-weight: 600; }
+      .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+      @media (max-width: 720px) {
+        .kanji-float { width: 44px; height: 44px; font-size: 20px; }
+        .k1 { left: 2%; }
+        .k3 { right: 2%; }
+        .k2, .k4 { display: none; }
+      }
+
+      .carousel-wrap { max-width: 680px; margin: 0 auto; }
+      .carousel { overflow: hidden; border: 4px solid var(--ink); background: #fff; box-shadow: 8px 8px 0 var(--ink); }
+      .track { display: flex; transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); touch-action: pan-y; }
+      .slide { min-width: 100%; padding: 36px 40px 42px; }
+      .slide .tag {
+        display: inline-block;
+        font-weight: 900;
+        font-size: 13px;
+        color: #fff;
+        padding: 4px 12px;
+        border: 3px solid var(--ink);
+        margin-bottom: 14px;
+      }
+      .slide h3 { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
+      .slide p { font-weight: 600; line-height: 1.7; }
+      .slide .demo {
+        margin-top: 18px;
+        border: 3px solid var(--ink);
+        background: var(--cream);
+        padding: 14px 18px;
+        font-size: 18px;
+        font-weight: 700;
+        box-shadow: 4px 4px 0 var(--ink);
+        display: inline-block;
+      }
+      .car-nav { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 18px; }
+      .arrow {
+        width: 44px;
+        height: 44px;
+        border: 3px solid var(--ink);
+        background: var(--yellow);
+        font-size: 20px;
+        font-weight: 900;
+        cursor: pointer;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .arrow:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--ink); }
+      .dots { display: flex; gap: 8px; }
+      .dot { width: 14px; height: 14px; border: 3px solid var(--ink); background: #fff; border-radius: 50%; cursor: pointer; padding: 0; }
+      .dot.on { background: var(--red); }
+      @media (max-width: 720px) {
+        .slide { padding: 24px 22px 30px; }
+      }
+
+      .pro { background: var(--blue); border-top: 4px solid var(--ink); border-bottom: 4px solid var(--ink); }
+      .pro h2,
+      .pro p.lead { color: #fff; }
+      .pro-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 22px;
+        max-width: 980px;
+        margin: 0 auto;
+        perspective: 900px;
+      }
+      .tilt {
+        background: #fff;
+        border: 4px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--ink);
+        padding: 24px;
+        transition: transform 0.12s ease-out;
+        transform-style: preserve-3d;
+      }
+      .tilt .icon {
+        width: 48px;
+        height: 48px;
+        border: 3px solid var(--ink);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 900;
+        color: #fff;
+        margin-bottom: 14px;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+      .tilt h3 { font-size: 18px; font-weight: 900; margin-bottom: 8px; }
+      .tilt p { font-size: 14px; font-weight: 600; line-height: 1.65; }
+      .price-banner { text-align: center; margin-top: 38px; }
+      .price-tag {
+        display: inline-block;
+        background: var(--yellow);
+        border: 4px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--ink);
+        padding: 18px 34px;
+        font-weight: 900;
+        font-size: 22px;
+        transform: rotate(-2deg);
+      }
+      .price-tag small { display: block; font-size: 13px; font-weight: 700; margin-top: 6px; }
+
+      .ja-card {
+        max-width: 680px;
+        margin: 20px auto 0;
+        background: #fff;
+        border: 4px solid var(--ink);
+        box-shadow: 8px 8px 0 var(--ink);
+        padding: 28px 32px;
+        font-weight: 600;
+        line-height: 1.9;
+      }
     </style>
   </head>
   <body>
-    <header>
-      <div class="logo">読</div>
-      <h1>Adaptive Furigana</h1>
-      <p class="tagline">Read Japanese on any website at exactly your level.</p>
-    </header>
+    <nav>
+      <div class="logo"><span class="mark" aria-hidden="true">読</span> Adaptive Furigana</div>
+      <a
+        class="btn btn-red"
+        href="https://chromewebstore.google.com/detail/adaptive-furigana/akjibeceicacompcnncnjkhnleimkjkk"
+        >Add to Chrome — Free</a
+      >
+    </nav>
 
-    <p>
-      <strong>Adaptive Furigana</strong> is a Chrome browser extension for people
-      learning Japanese. The free version adds furigana to the kanji on any page
-      so you can read anything. Upgrade to Pro and it adapts to you — readings
-      appear <strong>only on kanji harder than your JLPT level</strong> (N5–N1), so
-      the kanji you already know stay clean.
-    </p>
+    <main>
+      <section class="hero" aria-label="Hero">
+        <div class="kanji-float k1" aria-hidden="true">読</div>
+        <div class="kanji-float k2" aria-hidden="true">漢</div>
+        <div class="kanji-float k3" aria-hidden="true">字</div>
+        <div class="kanji-float k4" aria-hidden="true">学</div>
+        <div class="badges">
+          <span class="badge" style="background: var(--green); color: #fff;">FREE</span>
+          <span class="badge" style="background: var(--yellow);">PRO — $4.99 ONE-TIME</span>
+          <span class="badge" style="background: #fff;">100% OFFLINE</span>
+        </div>
+        <h1>
+          Read <span class="hl">any</span> Japanese.<br />
+          <ruby class="ruby-demo" lang="ja">日本語<rt class="rt">にほんご</rt></ruby>
+          at your level.
+        </h1>
+        <p class="sub">
+          Furigana on every website, an offline dictionary on click, and a Pro
+          mode that adapts to your JLPT level.
+        </p>
+        <div class="cta-row">
+          <a
+            class="btn btn-red"
+            href="https://chromewebstore.google.com/detail/adaptive-furigana/akjibeceicacompcnncnjkhnleimkjkk"
+            >🧩 Add to Chrome — Free</a
+          >
+          <a class="btn btn-yellow" href="#pro">See Pro ↓</a>
+        </div>
+      </section>
 
-    <h2>Features (free)</h2>
-    <ul>
-      <li><strong>Furigana on any site</strong> — readings appear above the kanji on the page so you can read anything</li>
-      <li><strong>Click-to-define</strong> — click any word for its reading, part of speech, and meaning</li>
-      <li><strong>100% offline</strong> — the tokenizer and dictionary are bundled in the extension; no servers, no tracking, no account</li>
-      <li><strong>Per-site control</strong> and adjustable ruby size and color</li>
-    </ul>
+      <section class="section" id="features">
+        <h2><span class="underline">What it does</span></h2>
+        <p class="lead">Everything below is free, forever.</p>
+        <div class="carousel-wrap">
+          <div class="carousel">
+            <div class="track" id="track">
+              <div class="slide">
+                <span class="tag" style="background: var(--red);">FURIGANA</span>
+                <h3>Furigana on any site</h3>
+                <p>
+                  Open any page — news, blogs, novels — and readings appear
+                  above the kanji instantly.
+                </p>
+                <div class="demo">
+                  日本語<ruby>能力<rt>のうりょく</rt></ruby><ruby>試験<rt>しけん</rt></ruby>に<ruby>合格<rt>ごうかく</rt></ruby>した
+                </div>
+              </div>
+              <div class="slide">
+                <span class="tag" style="background: var(--blue);">DICTIONARY</span>
+                <h3>Click any word to define it</h3>
+                <p>
+                  Reading, part of speech, and meaning pop up right where you
+                  clicked. No tab switching.
+                </p>
+                <div class="demo">合格 — ごうかく【noun】passing (an exam) ✅</div>
+              </div>
+              <div class="slide">
+                <span class="tag" style="background: var(--green);">OFFLINE</span>
+                <h3>100% offline &amp; private</h3>
+                <p>
+                  The tokenizer and dictionary are bundled inside the extension.
+                  No servers, no tracking, no account.
+                </p>
+                <div class="demo">📡 ✕ Zero network requests</div>
+              </div>
+              <div class="slide">
+                <span class="tag" style="background: var(--ink);">CONTROL</span>
+                <h3>Your page, your rules</h3>
+                <p>
+                  Turn it off per site, and adjust the ruby size and color to
+                  match how you read.
+                </p>
+                <div class="demo">Aa 🎨 Per-site on/off</div>
+              </div>
+            </div>
+          </div>
+          <div class="car-nav">
+            <button class="arrow" id="prev" aria-label="Previous slide">←</button>
+            <div class="dots" id="dots"></div>
+            <button class="arrow" id="next" aria-label="Next slide">→</button>
+          </div>
+          <noscript><style>.car-nav { display: none; }</style></noscript>
+        </div>
+      </section>
 
-    <h2>Pro upgrade — what we sell</h2>
-    <div class="card">
-      <h3>Adaptive Furigana Pro <span class="price">— one-time purchase ($4.99)</span></h3>
-      <p>
-        A single, optional in-extension purchase unlocks a richer reading
-        experience. It is a one-time payment, not a subscription:
-      </p>
-      <ul>
-        <li><strong>Adaptive furigana</strong> — show readings only on kanji harder than your JLPT level (N5–N1); the kanji you already know stay clean</li>
-        <li><strong>Full dictionary</strong> — every sense of a word, each tagged with its part of speech</li>
-        <li><strong>Example sentences</strong> — real Japanese sentences with English translations</li>
-        <li><strong>Read-aloud</strong> — hear the word pronounced (browser text-to-speech)</li>
-      </ul>
-      <p>
-        The free version stays fully functional forever — Pro removes the clutter
-        and adds depth for serious learners. Payment is processed securely through
-        <a href="https://extensionpay.com" target="_blank" rel="noopener">ExtensionPay</a>
-        and <a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a>;
-        we never see your card details.
-      </p>
-    </div>
+      <section class="section pro" id="pro">
+        <h2>PRO — it adapts to <span style="box-shadow: inset 0 -14px 0 var(--red);">you</span></h2>
+        <p class="lead">One optional upgrade. The free version stays fully functional forever.</p>
+        <div class="pro-grid">
+          <div class="tilt">
+            <div class="icon" style="background: var(--red);">級</div>
+            <h3>Adaptive furigana</h3>
+            <p>
+              Set your JLPT level (N5–N1). Readings appear only on kanji you
+              don't know yet — the kanji you already know stay clean.
+            </p>
+          </div>
+          <div class="tilt">
+            <div class="icon" style="background: var(--blue);">辞</div>
+            <h3>Full dictionary</h3>
+            <p>Every sense of a word, each tagged with its part of speech.</p>
+          </div>
+          <div class="tilt">
+            <div class="icon" style="background: var(--green);">文</div>
+            <h3>Example sentences</h3>
+            <p>Real Japanese sentences with English translations.</p>
+          </div>
+          <div class="tilt">
+            <div class="icon" style="background: var(--ink);">声</div>
+            <h3>Read-aloud</h3>
+            <p>Hear any word pronounced with browser text-to-speech.</p>
+          </div>
+        </div>
+        <div class="price-banner">
+          <div class="price-tag">
+            $4.99 — one-time
+            <small>
+              Not a subscription. Secure payment via ExtensionPay &amp; Stripe —
+              we never see your card details.
+            </small>
+          </div>
+        </div>
+      </section>
 
-    <h2>Privacy</h2>
-    <p>
-      This extension does not collect, store, or transmit any personal data. All
-      processing happens locally in your browser.
-      Read the full <a href="./privacy.html">Privacy Policy</a>.
-    </p>
-
-    <h2>Data sources &amp; attribution</h2>
-    <ul>
-      <li>Dictionary: JMdict/EDICT project (EDRDG licence)</li>
-      <li>Example sentences: Tatoeba project (CC-BY)</li>
-    </ul>
-
-    <hr />
-
-    <h2 class="ja">日本語</h2>
-    <p class="ja">
-      <strong>Adaptive Furigana</strong> は、日本語学習者向けの Chrome 拡張機能です。
-      無料版はどんなページの漢字にもふりがなを付けて、何でも読めるようにします。
-      Pro にアップグレードすると、<strong>あなたの JLPT レベルより難しい漢字だけ</strong>に
-      読みを絞り込み、知っている漢字はそのままスッキリ表示できます。
-    </p>
-    <p class="ja">
-      本体は無料です。任意の買い切り「Pro」（一度きりの支払い・$4.99）を購入すると、
-      レベル別にふりがなを出し分ける適応モード＋全語義・品詞・英訳付き例文・読み上げ（音声合成）が解放されます。支払いは
-      ExtensionPay と Stripe を通じて安全に処理され、当方がカード情報を見ることはありません。
-      詳しくは<a href="./privacy.html">プライバシーポリシー</a>をご覧ください。
-    </p>
+      <section class="section" lang="ja">
+        <h2><span class="underline">日本語</span></h2>
+        <div class="ja-card">
+          <strong>Adaptive Furigana</strong> は日本語学習者向けの Chrome
+          拡張機能です。無料版はどんなページの漢字にもふりがなを付け、単語をクリックすると読み・品詞・意味も表示します（完全オフライン動作・データ収集ゼロ）。
+          Pro（買い切り $4.99・サブスクではありません）にアップグレードすると、あなたの
+          JLPT
+          レベルより難しい漢字だけにふりがなを絞り込む適応モードに加え、全語義・英訳付き例文・読み上げが使えます。支払いは
+          ExtensionPay と Stripe
+          を通じて安全に処理され、当方がカード情報を見ることはありません。
+        </div>
+      </section>
+    </main>
 
     <footer>
       <a href="./privacy.html">Privacy Policy</a> ·
       <a href="./tokushoho.html">特定商取引法に基づく表記</a> ·
       <a href="mailto:moumuri123123@gmail.com">Contact</a>
+      <div class="attr">
+        Dictionary: JMdict/EDICT, property of the Electronic Dictionary Research
+        and Development Group (EDRDG licence) · Example sentences: Tatoeba
+        project (CC-BY) · JLPT kanji lists: Jonathan Waller,
+        <a href="https://www.tanos.co.uk/jlpt/" target="_blank" rel="noopener noreferrer">tanos.co.uk</a>
+        (CC-BY) · kanji-data by David Gouveia (MIT)
+      </div>
     </footer>
+
+    <script>
+      (function () {
+        var track = document.getElementById("track");
+        var dots = document.getElementById("dots");
+        var slides = track.children.length;
+        var index = 0;
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        for (var d = 0; d < slides; d++) {
+          var dot = document.createElement("button");
+          dot.className = "dot" + (d === 0 ? " on" : "");
+          dot.setAttribute("aria-label", "Go to slide " + (d + 1));
+          dot.dataset.i = d;
+          dot.addEventListener("click", function () {
+            index = +this.dataset.i;
+            render();
+            stopAuto();
+          });
+          dots.appendChild(dot);
+        }
+
+        function render() {
+          track.style.transform = "translateX(-" + index * 100 + "%)";
+          for (var k = 0; k < slides; k++) {
+            dots.children[k].className = "dot" + (k === index ? " on" : "");
+          }
+        }
+        function go(dir) {
+          index = (index + dir + slides) % slides;
+          render();
+        }
+
+        document.getElementById("prev").addEventListener("click", function () { go(-1); stopAuto(); });
+        document.getElementById("next").addEventListener("click", function () { go(1); stopAuto(); });
+
+        var timer = null;
+        if (!reduceMotion) timer = setInterval(function () { go(1); }, 4500);
+        function stopAuto() {
+          if (timer) {
+            clearInterval(timer);
+            timer = null;
+          }
+        }
+
+        var startX = null;
+        track.addEventListener("pointerdown", function (e) { startX = e.clientX; });
+        track.addEventListener("pointerup", function (e) {
+          if (startX === null) return;
+          var dx = e.clientX - startX;
+          if (dx > 40) { go(-1); stopAuto(); }
+          else if (dx < -40) { go(1); stopAuto(); }
+          startX = null;
+        });
+      })();
+
+      (function () {
+        var canHover = window.matchMedia("(hover: hover)").matches;
+        var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!canHover || reduceMotion) return;
+        document.querySelectorAll(".tilt").forEach(function (card) {
+          card.addEventListener("mousemove", function (e) {
+            var r = card.getBoundingClientRect();
+            var x = (e.clientX - r.left) / r.width - 0.5;
+            var y = (e.clientY - r.top) / r.height - 0.5;
+            card.style.transform =
+              "rotateY(" + x * 16 + "deg) rotateX(" + -y * 16 + "deg) translateZ(8px)";
+          });
+          card.addEventListener("mouseleave", function () {
+            card.style.transform = "none";
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
